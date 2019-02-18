@@ -1,0 +1,33 @@
+set_io GBACART_RD                    1 # (PMOD7)
+set_io GBACART_CS                    2
+#set_io                              9
+#set_io                             10
+set_io din[0]                        3 # (PMOD8)
+set_io din[1]                        4
+set_io wclk                          7
+set_io write_en                      8
+set_io GBACART_AD[0]                15 # (PMOD9)
+set_io GBACART_AD[1]                16
+set_io GBACART_AD[2]                19
+set_io GBACART_AD[3]                20
+set_io GBACART_AD[4]                11 # (PMOD10)
+set_io GBACART_AD[5]                12
+set_io GBACART_AD[6]                17
+set_io GBACART_AD[7]                18
+set_io GBACART_AD[8]                21 # (PMOD11)
+set_io GBACART_AD[9]                22
+set_io GBACART_AD[10]               33
+set_io GBACART_AD[11]               34
+set_io GBACART_AD[12]               25 # (PMOD12)
+set_io GBACART_AD[13]               26
+set_io GBACART_AD[14]               31
+set_io GBACART_AD[15]               32
+set_io buttons[0]                  107 # Button A (PMOD5)
+set_io buttons[1]                  112 # Button B
+set_io buttons[4]                  114 # Right
+set_io buttons[5]                  143 # Left
+set_io buttons[6]                  106 # Up       (PMOD6)
+set_io buttons[7]                  110 # Down
+set_io buttons[2]                   70 # Select   (LED1)
+set_io buttons[3]                   68 # Start    (LED2)
+set_io clk100                      129 # Onboard 100MHz oscillator
