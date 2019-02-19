@@ -10,13 +10,12 @@ void setup() {
 }
 
 bool dirty = true;
-uint8_t duration, upperByte, lowerByte;
 
 void loop() {
   if (!arduboy.nextFrame())
     return;
 
-  beepTimer();
+  arduboy.timer();
 
   dirty = !arduboy.nextFrame();
 
@@ -67,7 +66,7 @@ void loop() {
     if (arduboy.pressed(B_BUTTON))
     {
       arduboy.fillCircle(88, 30, 12);
-      beepTone(1750, 5); // 440Hz
+      arduboy.tone(1750, 5); // 440Hz
     }
     else
       arduboy.drawCircle(88, 30, 12);
@@ -75,27 +74,12 @@ void loop() {
     if (arduboy.pressed(A_BUTTON))
     {
       arduboy.fillCircle(115, 24, 12);
-      beepTone(1899, 5); // 880Hz
+      arduboy.tone(1899, 5); // 880Hz
     }
     else
       arduboy.drawCircle(115, 24, 12);
 
-    arduboy.display(false, lowerByte, upperByte);
+    arduboy.display();
     dirty = false;
-  }
-}
-
-void beepTone(uint16_t freq, uint8_t dur)
-{
-  duration = dur;
-  upperByte = 0xF0 + ((freq & 0x0700) >> 8); // volume full + upper 3 bits of freq
-  lowerByte = (freq & 0x00FF); // lower 8 bits of freq
-}
-
-void beepTimer()
-{
-  if (duration && (--duration == 0))
-  {
-    upperByte &= ~0xF0; // mute
   }
 }

@@ -828,9 +828,9 @@ void Arduboy2Base::display()
   paintScreen(sBuffer);
 }
 
-void Arduboy2Base::display(bool clear, uint8_t lowerByte, uint8_t upperByte)
+void Arduboy2Base::display(bool clear)
 {
-  paintScreen(sBuffer, clear, lowerByte, upperByte);
+  paintScreen(sBuffer, clear);
 }
 
 uint8_t* Arduboy2Base::getBuffer()

@@ -379,7 +379,7 @@ class Arduboy2Base : public Arduboy2Core
    *
    * \see display() clear()
    */
-  void display(bool clear, uint8_t lowerByte, uint8_t upperByte);
+  void display(bool clear);
 
   /** \brief
    * Set a single pixel in the display buffer to the specified color.

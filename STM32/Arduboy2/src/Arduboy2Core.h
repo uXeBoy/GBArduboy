@@ -40,6 +40,80 @@
 #define WIDTH 128 /**< The width of the display in pixels */
 #define HEIGHT 64 /**< The height of the display in pixels */
 
+#define NOTE_REST       0
+#define NOTE_C3         44
+#define NOTE_CS3        156
+#define NOTE_D3         262
+#define NOTE_DS3        363
+#define NOTE_E3         457
+#define NOTE_F3         547
+#define NOTE_FS3        631
+#define NOTE_G3         710
+#define NOTE_GS3        786
+#define NOTE_A3         854
+#define NOTE_AS3        923
+#define NOTE_B3         986
+#define NOTE_C4         1046
+#define NOTE_CS4        1102
+#define NOTE_D4         1155
+#define NOTE_DS4        1205
+#define NOTE_E4         1253
+#define NOTE_F4         1297
+#define NOTE_FS4        1339
+#define NOTE_G4         1379
+#define NOTE_GS4        1417
+#define NOTE_A4         1452
+#define NOTE_AS4        1486
+#define NOTE_B4         1517
+#define NOTE_C5         1546
+#define NOTE_CS5        1575
+#define NOTE_D5         1602
+#define NOTE_DS5        1627
+#define NOTE_E5         1650
+#define NOTE_F5         1673
+#define NOTE_FS5        1694
+#define NOTE_G5         1714
+#define NOTE_GS5        1732
+#define NOTE_A5         1750
+#define NOTE_AS5        1767
+#define NOTE_B5         1783
+#define NOTE_C6         1798
+#define NOTE_CS6        1812
+#define NOTE_D6         1825
+#define NOTE_DS6        1837
+#define NOTE_E6         1849
+#define NOTE_F6         1860
+#define NOTE_FS6        1871
+#define NOTE_G6         1881
+#define NOTE_GS6        1890
+#define NOTE_A6         1899
+#define NOTE_AS6        1907
+#define NOTE_B6         1915
+#define NOTE_C7         1923
+#define NOTE_CS7        1930
+#define NOTE_D7         1936
+#define NOTE_DS7        1943
+#define NOTE_E7         1949
+#define NOTE_F7         1954
+#define NOTE_FS7        1959
+#define NOTE_G7         1964
+#define NOTE_GS7        1969
+#define NOTE_A7         1974
+#define NOTE_AS7        1978
+#define NOTE_B7         1982
+#define NOTE_C8         1985
+#define NOTE_CS8        1988
+#define NOTE_D8         1992
+#define NOTE_DS8        1995
+#define NOTE_E8         1998
+#define NOTE_F8         2001
+#define NOTE_FS8        2004
+#define NOTE_G8         2006
+#define NOTE_GS8        2009
+#define NOTE_A8         2011
+#define NOTE_AS8        2013
+#define NOTE_B8         2015
+
 /** \brief
  * Lower level functions generally dealing directly with the hardware.
  *
@@ -120,7 +194,7 @@ class Arduboy2Core
      *
      * \see paint8Pixels()
      */
-    void static paintScreen(uint8_t image[], bool clear = false, uint8_t lowerByte = 0, uint8_t upperByte = 0);
+    void static paintScreen(uint8_t image[], bool clear = false);
 
     /** \brief
      * Blank the display screen by setting all pixels off.
@@ -181,6 +255,68 @@ class Arduboy2Core
      * of Arduino `delay()` will save a few bytes of code.
      */
     void static delayShort(uint16_t ms) __attribute__ ((noinline));
+
+  /** \brief
+   * The counter used by the `timer()` function to time the duration of a tone.
+   *
+   * \details
+   * This variable is set by the `dur` parameter of the `tone()` function.
+   * It is then decremented each time the `timer()` function is called, if its
+   * value isn't 0. When `timer()` decrements it to 0, a tone that is playing
+   * will be stopped.
+   *
+   * A sketch can determine if a tone is currently playing by testing if
+   * this variable is non-zero (assuming it's a timed tone, not a continuous
+   * tone).
+   *
+   * Example:
+   * \code{.cpp}
+   * beep.tone(beep.freq(1000), 15);
+   * while (beep.duration != 0) { } // wait for the tone to stop playing
+   * \endcode
+   *
+   * It can also be manipulated directly by the sketch, although this should
+   * seldom be necessary.
+   */
+  static uint8_t duration;
+  static uint8_t upperByte;
+  static uint8_t lowerByte;
+
+  /** \brief
+   * Play a tone for a given duration.
+   *
+   * \param count The count to be loaded into the timer/counter to play
+   *              the desired frequency.
+   * \param dur The duration of the tone, used by `timer()`.
+   *
+   * \details
+   * A tone is played for the specified duration, or until replaced by another
+   * tone or stopped using `noTone()`.
+   *
+   * The tone's frequency is determined by the specified count, which is loaded
+   * into the timer/counter that generates the tone. A desired frequency can be
+   * converted into the required count value using the `freq()` function.
+   *
+   * The duration value is the number of times the `timer()` function must be
+   * called before the tone is stopped.
+   *
+   * \see freq() timer() noTone()
+   */
+  static void tone(uint16_t freq, uint8_t dur);
+
+  /** \brief
+   * Handle the duration that a tone plays for.
+   *
+   * \details
+   * This function must be called at a constant interval, which would normally
+   * be once per frame, in order to stop a tone after the desired tone duration
+   * has elapsed.
+   *
+   * If the value of the `duration` variable is not 0, it will be decremented.
+   * When the `duration` variable is decremented to 0, a playing tone will be
+   * stopped.
+   */
+  static void timer();
 
   protected:
     // internals

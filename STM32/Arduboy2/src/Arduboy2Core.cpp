@@ -8,6 +8,25 @@
 
 Arduboy2Core::Arduboy2Core() { }
 
+uint8_t Arduboy2Core::duration = 0;
+uint8_t Arduboy2Core::upperByte = 0;
+uint8_t Arduboy2Core::lowerByte = 0;
+
+void Arduboy2Core::tone(uint16_t freq, uint8_t dur)
+{
+  duration = dur;
+  upperByte = 0xF0 + ((freq & 0x0700) >> 8); // volume full + upper 3 bits of freq
+  lowerByte = (freq & 0x00FF); // lower 8 bits of freq
+}
+
+void Arduboy2Core::timer()
+{
+  if (duration && (--duration == 0))
+  {
+    upperByte &= ~0xF0; // mute
+  }
+}
+
 void Arduboy2Core::boot()
 {
   bootPins();
@@ -40,7 +59,7 @@ uint8_t Arduboy2Core::height() { return HEIGHT; }
 
 /* Drawing */
 
-void Arduboy2Core::paintScreen(uint8_t image[], bool clear, uint8_t lowerByte, uint8_t upperByte)
+void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
   gpio_write_bit(GPIOC, 0, HIGH);  // dc HIGH
 
