@@ -30,12 +30,17 @@
 
 // bit values for button states
 // these are determined by the buttonsState() function
-#define A_BUTTON     _BV(0)     /**< The A button value for functions requiring a bitmask */
-#define B_BUTTON     _BV(1)     /**< The B button value for functions requiring a bitmask */
-#define RIGHT_BUTTON _BV(4) /**< The Right button value for functions requiring a bitmask */
-#define LEFT_BUTTON  _BV(5)  /**< The Left button value for functions requiring a bitmask */
-#define UP_BUTTON    _BV(6)    /**< The Up button value for functions requiring a bitmask */
-#define DOWN_BUTTON  _BV(7)  /**< The Down button value for functions requiring a bitmask */
+#define A_BUTTON      4 /**< The A button value for functions requiring a bitmask */
+#define B_BUTTON      8 /**< The B button value for functions requiring a bitmask */
+#define RIGHT_BUTTON 16 /**< The Right button value for functions requiring a bitmask */
+#define LEFT_BUTTON  32 /**< The Left button value for functions requiring a bitmask */
+#define UP_BUTTON    64 /**< The Up button value for functions requiring a bitmask */
+#define DOWN_BUTTON 128 /**< The Down button value for functions requiring a bitmask */
+
+#define DC_BIT   0x40000000
+#define WCLK_BIT 0x10000000
+#define D1_BIT   0x08000000
+#define D0_BIT   0x04000000
 
 #define WIDTH 128 /**< The width of the display in pixels */
 #define HEIGHT 64 /**< The height of the display in pixels */

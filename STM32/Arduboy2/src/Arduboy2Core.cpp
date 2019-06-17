@@ -37,17 +37,23 @@ void Arduboy2Core::boot()
 void Arduboy2Core::bootPins()
 {
 #ifdef ARDUBOY_10
-  pinMode(14, INPUT); // A_BUTTON     (PB8)
-  pinMode(24, INPUT); // B_BUTTON     (PB9)
-  pinMode(31, INPUT); // RIGHT_BUTTON (PB12)
-  pinMode(32, INPUT); // LEFT_BUTTON  (PB13)
-  pinMode(33, INPUT); // UP_BUTTON    (PB14)
-  pinMode(34, INPUT); // DOWN_BUTTON  (PB15)
+  pinMode(A4, INPUT); // A_BUTTON     (P0.02)
+  pinMode(A5, INPUT); // B_BUTTON     (P0.03)
+  pinMode(A0, INPUT); // RIGHT_BUTTON (P0.04)
+  pinMode(A1, INPUT); // LEFT_BUTTON  (P0.05)
+  pinMode(11, INPUT); // UP_BUTTON    (P0.06)
+  pinMode(6,  INPUT); // DOWN_BUTTON  (P0.07)
 
-  pinMode(15, OUTPUT); // dc   (PC0)
-  pinMode(16, OUTPUT); // wclk (PC1)
-  pinMode(17, OUTPUT); // d0   (PC2)
-  pinMode(18, OUTPUT); // d1   (PC3)
+  pinMode(5,  INPUT); // CS_IS25LP128F (P1.08)
+  pinMode(13, INPUT); // CRESET_B      (P1.09)
+
+  pinMode(A2, OUTPUT); // dc   (P0.30)
+  pinMode(A3, OUTPUT); // wclk (P0.28)
+  pinMode(10, OUTPUT); // d0   (P0.27)
+  pinMode(9,  OUTPUT); // d1   (P0.26)
+
+  pinMode(12, OUTPUT); // Spare! (P0.08 / FPGA pin 30)
+  NRF_P0->OUTCLR = 0x08;
 #elif defined(AB_DEVKIT)
 
 #endif
@@ -61,7 +67,7 @@ uint8_t Arduboy2Core::height() { return HEIGHT; }
 
 void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
-  gpio_write_bit(GPIOC, 0, HIGH);  // dc HIGH
+  NRF_P0->OUTSET = DC_BIT; // dc HIGH
 
   for (uint8_t t = 0; t < 8; t++) // eight 'pages'
   {
@@ -73,93 +79,93 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 
       for (uint8_t i = 0; i < 16; i++) // 16 horizontal bytes = 128 pixels
       {
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 2, HIGH);
-        else                    gpio_write_bit(GPIOC, 2, LOW);
+        if (image[a] & bitMask) NRF_P0->OUTSET = D0_BIT;
+        else                    NRF_P0->OUTCLR = D0_BIT;
 
         a++;
 
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 3, HIGH);
-        else                    gpio_write_bit(GPIOC, 3, LOW);
+        if (image[a] & bitMask) NRF_P0->OUTSET = D1_BIT;
+        else                    NRF_P0->OUTCLR = D1_BIT;
 
         a++;
 
-        gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-        gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+        NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+        NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
 
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 2, HIGH);
-        else                    gpio_write_bit(GPIOC, 2, LOW);
-
-        a++;
-
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 3, HIGH);
-        else                    gpio_write_bit(GPIOC, 3, LOW);
+        if (image[a] & bitMask) NRF_P0->OUTSET = D0_BIT;
+        else                    NRF_P0->OUTCLR = D0_BIT;
 
         a++;
 
-        gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-        gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
-
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 2, HIGH);
-        else                    gpio_write_bit(GPIOC, 2, LOW);
+        if (image[a] & bitMask) NRF_P0->OUTSET = D1_BIT;
+        else                    NRF_P0->OUTCLR = D1_BIT;
 
         a++;
 
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 3, HIGH);
-        else                    gpio_write_bit(GPIOC, 3, LOW);
+        NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+        NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
+
+        if (image[a] & bitMask) NRF_P0->OUTSET = D0_BIT;
+        else                    NRF_P0->OUTCLR = D0_BIT;
 
         a++;
 
-        gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-        gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
-
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 2, HIGH);
-        else                    gpio_write_bit(GPIOC, 2, LOW);
+        if (image[a] & bitMask) NRF_P0->OUTSET = D1_BIT;
+        else                    NRF_P0->OUTCLR = D1_BIT;
 
         a++;
 
-        if (image[a] & bitMask) gpio_write_bit(GPIOC, 3, HIGH);
-        else                    gpio_write_bit(GPIOC, 3, LOW);
+        NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+        NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
+
+        if (image[a] & bitMask) NRF_P0->OUTSET = D0_BIT;
+        else                    NRF_P0->OUTCLR = D0_BIT;
 
         a++;
 
-        gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-        gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+        if (image[a] & bitMask) NRF_P0->OUTSET = D1_BIT;
+        else                    NRF_P0->OUTCLR = D1_BIT;
+
+        a++;
+
+        NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+        NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
       }
 
-      gpio_write_bit(GPIOC, 2, LOW);
-      gpio_write_bit(GPIOC, 3, LOW);
+      NRF_P0->OUTCLR = D0_BIT;
+      NRF_P0->OUTCLR = D1_BIT;
 
       for (uint8_t i = 0; i < 56; i++) // 128 + 112 = 240 horizontal pixels
       {
-        gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-        gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+        NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+        NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
       }
     }
   }
 
-  gpio_write_bit(GPIOC, 0, LOW);  // dc LOW
+  NRF_P0->OUTCLR = DC_BIT; // dc LOW
 
   for (uint8_t i = 0; i < 4; i++)
   {
-    if (upperByte & B10000000) gpio_write_bit(GPIOC, 2, HIGH);
-    else                       gpio_write_bit(GPIOC, 2, LOW);
-    if (upperByte & B01000000) gpio_write_bit(GPIOC, 3, HIGH);
-    else                       gpio_write_bit(GPIOC, 3, LOW);
+    if (upperByte & B10000000) NRF_P0->OUTSET = D0_BIT;
+    else                       NRF_P0->OUTCLR = D0_BIT;
+    if (upperByte & B01000000) NRF_P0->OUTSET = D1_BIT;
+    else                       NRF_P0->OUTCLR = D1_BIT;
 
-    gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-    gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+    NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+    NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
 
     upperByte = upperByte << 2;
   }
   for (uint8_t i = 0; i < 4; i++)
   {
-    if (lowerByte & B10000000) gpio_write_bit(GPIOC, 2, HIGH);
-    else                       gpio_write_bit(GPIOC, 2, LOW);
-    if (lowerByte & B01000000) gpio_write_bit(GPIOC, 3, HIGH);
-    else                       gpio_write_bit(GPIOC, 3, LOW);
+    if (lowerByte & B10000000) NRF_P0->OUTSET = D0_BIT;
+    else                       NRF_P0->OUTCLR = D0_BIT;
+    if (lowerByte & B01000000) NRF_P0->OUTSET = D1_BIT;
+    else                       NRF_P0->OUTCLR = D1_BIT;
 
-    gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-    gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+    NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+    NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
 
     lowerByte = lowerByte << 2;
   }
@@ -167,20 +173,20 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 
 void Arduboy2Core::blank()
 {
-  gpio_write_bit(GPIOC, 2, LOW);
-  gpio_write_bit(GPIOC, 3, LOW);
+  NRF_P0->OUTCLR = D0_BIT;
+  NRF_P0->OUTCLR = D1_BIT;
 
-  gpio_write_bit(GPIOC, 0, HIGH);  // dc HIGH
+  NRF_P0->OUTSET = DC_BIT; // dc HIGH
 
   for (uint16_t i = 0; i < 19200; i++)
   {
-    gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-    gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+    NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+    NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
   }
 
-  gpio_write_bit(GPIOC, 0, LOW);  // dc LOW
-  gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-  gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+  NRF_P0->OUTCLR = DC_BIT;   // dc LOW
+  NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+  NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
 }
 
 // turn all display pixels on, ignoring buffer contents
@@ -189,20 +195,20 @@ void Arduboy2Core::allPixelsOn(bool on)
 {
   if (on)
   {
-    gpio_write_bit(GPIOC, 2, HIGH);
-    gpio_write_bit(GPIOC, 3, HIGH);
+    NRF_P0->OUTSET = D0_BIT;
+    NRF_P0->OUTSET = D1_BIT;
 
-    gpio_write_bit(GPIOC, 0, HIGH);  // dc HIGH
+    NRF_P0->OUTSET = DC_BIT; // dc HIGH
 
     for (uint16_t i = 0; i < 19200; i++)
     {
-      gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-      gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+      NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+      NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
     }
 
-    gpio_write_bit(GPIOC, 0, LOW);  // dc LOW
-    gpio_write_bit(GPIOC, 1, LOW);  // wclk LOW
-    gpio_write_bit(GPIOC, 1, HIGH); // wclk HIGH
+    NRF_P0->OUTCLR = DC_BIT;   // dc LOW
+    NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
+    NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
   }
 }
 
@@ -214,7 +220,7 @@ uint8_t Arduboy2Core::buttonsState()
 
 #ifdef ARDUBOY_10
 
-  buttons = ~((GPIOB->regs->IDR) >> 8);
+  buttons = ~((NRF_P0->IN) & 0xFC);
 
 #elif defined(AB_DEVKIT)
 

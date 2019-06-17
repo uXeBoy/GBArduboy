@@ -1,7 +1,7 @@
 `default_nettype none
 
 module top(
-  input wire clk100,
+  input wire clk,
   input wire GBACART_CS,
   input wire GBACART_RD,
   //input wire [7:0]  GBACART_AH,
@@ -11,7 +11,7 @@ module top(
   input wire wclk,
   input wire write_en,
 
-  output reg [7:0] buttons
+  output reg [5:0] buttons
 );
 
 reg  [15:0] gba_data_out;
@@ -65,7 +65,7 @@ begin
       else if (gba_addr_lo > 16'h7FF && gba_addr_lo < 16'hC00)
         begin
           gba_data_out = sound; // upper 4 bits volume / mute, lower 11 bits frequency
-          buttons <= gba_addr_lo[7:0]; // button states encoded into address
+          buttons <= {gba_addr_lo[7:4], gba_addr_lo[1:0]}; // button states encoded into address
         end
     end
   if (risingRD) gba_addr_lo <= gba_addr_lo + 1'b1;
@@ -91,21 +91,6 @@ SB_IO #(
     .OUTPUT_ENABLE((!GBACART_RD && !GBACART_CS)),
     .D_OUT_0(gba_data_out[15:0]),
     .D_IN_0(gba_addr_lo_in[15:0])
-);
-
-wire clk;
-
-SB_PLL40_PAD #(
-    .FEEDBACK_PATH ("SIMPLE"),
-    .DIVR (4'b0111),
-    .DIVF (7'b0101010),
-    .DIVQ (3'b011),
-    .FILTER_RANGE (3'b001)
-) uut (
-    .RESETB         (1'b1),
-    .BYPASS         (1'b0),
-    .PACKAGEPIN     (clk100),
-    .PLLOUTGLOBAL   (clk) // 67.120 MHz (requested) 67.188 MHz (achieved)
 );
 
 endmodule
