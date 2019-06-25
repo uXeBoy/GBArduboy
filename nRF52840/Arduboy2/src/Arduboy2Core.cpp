@@ -8,20 +8,66 @@
 
 Arduboy2Core::Arduboy2Core() { }
 
-uint8_t Arduboy2Core::duration = 0;
 uint8_t Arduboy2Core::upperByte = 0;
 uint8_t Arduboy2Core::lowerByte = 0;
+uint16_t Arduboy2Core::duration = 0;
 
-void Arduboy2Core::tone(uint16_t freq, uint8_t dur)
+bool Arduboy2Core::tonesPlaying = false;
+static uint16_t *tonesStart = 0;
+static uint16_t *tonesIndex = 0;
+
+void Arduboy2Core::tone(uint16_t freq, uint16_t dur)
 {
-  duration = dur;
+  uint16_t toneSequence[3] = {freq, dur, TONES_END};
+
+  tone(toneSequence);
+}
+
+void Arduboy2Core::tone(uint16_t *tones)
+{
+  uint16_t freq;
+
+  tonesStart = tonesIndex = tones; // set to start of sequence array
+
+  freq = *tonesIndex++; // get tone frequency
+
+  duration = *tonesIndex++; // get tone duration
   upperByte = 0xF0 + ((freq & 0x0700) >> 8); // volume full + upper 3 bits of freq
   lowerByte = (freq & 0x00FF); // lower 8 bits of freq
+
+  tonesPlaying = true;
 }
 
 void Arduboy2Core::timer()
 {
-  if (duration && (--duration == 0))
+  uint16_t freq;
+
+  if (duration == 0)
+  {
+    if (tonesPlaying)
+    {
+      freq = *tonesIndex++; // get tone frequency
+
+      if (freq == TONES_END)
+      {
+        tonesPlaying = false; // if freq is actually an "end of sequence" marker
+      }
+      else
+      {
+        duration = *tonesIndex++; // get tone duration
+        if (freq == NOTE_REST)
+        {
+          upperByte &= ~0xF0; // mute
+        }
+        else
+        {
+          upperByte = 0xF0 + ((freq & 0x0700) >> 8); // volume full + upper 3 bits of freq
+          lowerByte = (freq & 0x00FF); // lower 8 bits of freq
+        }
+      }
+    }
+  }
+  else if (--duration < 2)
   {
     upperByte &= ~0xF0; // mute
   }
@@ -67,6 +113,9 @@ uint8_t Arduboy2Core::height() { return HEIGHT; }
 
 void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 {
+  uint8_t upperByteTemp = upperByte;
+  uint8_t lowerByteTemp = lowerByte;
+
   NRF_P0->OUTSET = DC_BIT; // dc HIGH
 
   for (uint8_t t = 0; t < 8; t++) // eight 'pages'
@@ -147,27 +196,27 @@ void Arduboy2Core::paintScreen(uint8_t image[], bool clear)
 
   for (uint8_t i = 0; i < 4; i++)
   {
-    if (upperByte & B10000000) NRF_P0->OUTSET = D0_BIT;
-    else                       NRF_P0->OUTCLR = D0_BIT;
-    if (upperByte & B01000000) NRF_P0->OUTSET = D1_BIT;
-    else                       NRF_P0->OUTCLR = D1_BIT;
+    if (upperByteTemp & B10000000) NRF_P0->OUTSET = D0_BIT;
+    else                           NRF_P0->OUTCLR = D0_BIT;
+    if (upperByteTemp & B01000000) NRF_P0->OUTSET = D1_BIT;
+    else                           NRF_P0->OUTCLR = D1_BIT;
 
     NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
     NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
 
-    upperByte = upperByte << 2;
+    upperByteTemp = upperByteTemp << 2;
   }
   for (uint8_t i = 0; i < 4; i++)
   {
-    if (lowerByte & B10000000) NRF_P0->OUTSET = D0_BIT;
-    else                       NRF_P0->OUTCLR = D0_BIT;
-    if (lowerByte & B01000000) NRF_P0->OUTSET = D1_BIT;
-    else                       NRF_P0->OUTCLR = D1_BIT;
+    if (lowerByteTemp & B10000000) NRF_P0->OUTSET = D0_BIT;
+    else                           NRF_P0->OUTCLR = D0_BIT;
+    if (lowerByteTemp & B01000000) NRF_P0->OUTSET = D1_BIT;
+    else                           NRF_P0->OUTCLR = D1_BIT;
 
     NRF_P0->OUTCLR = WCLK_BIT; // wclk LOW
     NRF_P0->OUTSET = WCLK_BIT; // wclk HIGH
 
-    lowerByte = lowerByte << 2;
+    lowerByteTemp = lowerByteTemp << 2;
   }
 }
 

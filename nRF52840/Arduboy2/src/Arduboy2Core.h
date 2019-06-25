@@ -45,6 +45,9 @@
 #define WIDTH 128 /**< The width of the display in pixels */
 #define HEIGHT 64 /**< The height of the display in pixels */
 
+// Frequency value for sequence termination. (No duration follows)
+#define TONES_END 0x8000
+
 #define NOTE_REST       0
 #define NOTE_C3         44
 #define NOTE_CS3        156
@@ -283,9 +286,10 @@ class Arduboy2Core
    * It can also be manipulated directly by the sketch, although this should
    * seldom be necessary.
    */
-  static uint8_t duration;
+  static uint16_t duration;
   static uint8_t upperByte;
   static uint8_t lowerByte;
+  static bool tonesPlaying;
 
   /** \brief
    * Play a tone for a given duration.
@@ -307,7 +311,9 @@ class Arduboy2Core
    *
    * \see freq() timer() noTone()
    */
-  static void tone(uint16_t freq, uint8_t dur);
+  static void tone(uint16_t freq, uint16_t dur);
+
+  static void tone(uint16_t *tones);
 
   /** \brief
    * Handle the duration that a tone plays for.
