@@ -13,12 +13,15 @@ uint8_t Arduboy2Core::lowerByte = 0;
 uint16_t Arduboy2Core::duration = 0;
 
 bool Arduboy2Core::tonesPlaying = false;
+uint16_t Arduboy2Core::toneSequence[3];
 static uint16_t *tonesStart = 0;
 static uint16_t *tonesIndex = 0;
 
 void Arduboy2Core::tone(uint16_t freq, uint16_t dur)
 {
-  uint16_t toneSequence[3] = {freq, dur, TONES_END};
+  toneSequence[0] = freq;
+  toneSequence[1] = dur;
+  toneSequence[2] = TONES_END;
 
   tone(toneSequence);
 }

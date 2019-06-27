@@ -290,6 +290,7 @@ class Arduboy2Core
   static uint8_t upperByte;
   static uint8_t lowerByte;
   static bool tonesPlaying;
+  static uint16_t toneSequence[];
 
   /** \brief
    * Play a tone for a given duration.
